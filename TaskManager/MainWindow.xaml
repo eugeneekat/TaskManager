@@ -60,18 +60,14 @@
         </Grid>
 
         <ListView Grid.Row="1" Name="ProcessListView" GridViewColumnHeader.Click="ProcessListView_Click">
-            
             <ListView.View>
-                
                 <GridView>
-
                     <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}"/>
                     <GridViewColumn Header="ProcessName" DisplayMemberBinding="{Binding Path=ProcessName}"/>
-                    <GridViewColumn Header="Title" DisplayMemberBinding="{Binding Path=MainWindowTitle}"/>
-                    <GridViewColumn Header="Priority" DisplayMemberBinding="{Binding Path=PriorityClass}"/>
+                    <GridViewColumn Header="MainWindowTitle" DisplayMemberBinding="{Binding Path=MainWindowTitle}"/>
+                    <GridViewColumn Header="PriorityClass" DisplayMemberBinding="{Binding Path=PriorityClass}"/>
                 </GridView>
             </ListView.View>
-                
         </ListView>
 
 

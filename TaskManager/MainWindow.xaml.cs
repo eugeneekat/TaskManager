@@ -104,7 +104,7 @@ namespace TaskManager
         {
             Process proc = this.ProcessListView.SelectedItem as Process;
             if(proc != null)
-                proc.Kill();           
+                proc.Kill(); 
         }
 
         private void ProcessListView_Click(object sender, RoutedEventArgs e)

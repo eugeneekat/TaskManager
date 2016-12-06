@@ -14,26 +14,23 @@ namespace TaskManager
 {
     public class ProcessEventArgs
     {
-        public int ProcessID { get; private set; }
-        public string ProcessName { get; private set; }
-        public ProcessEventArgs(int processID, string processName)
-        {
-            this.ProcessID = processID;
-            this.ProcessName = processName;
-        } 
+        public int ProcessID { get; set; }
+        public string ProcessName { get; set; }
     }
 
     public class PreformanceEventArgs
     {
         public float CPU_Usage { get; set; }
-        public ulong RAM_Usage { get; set;}
+        public float RAM_Usage { get; set;}
         public float DISC_Usage { get; set; }
+        public ulong RAM_Available { get; set; }
+        public ulong RAM_Total { get; set; }
     }
 
 
     class SystemWatcher : IDisposable
     {
-        private bool disposed = false;
+        bool disposed = false;
 
         string machine = string.Format("\\\\{0}\\root\\cimv2", Environment.MachineName);
 
@@ -42,7 +39,6 @@ namespace TaskManager
 
         PerformanceCounter cpuTime  = null;
         PerformanceCounter diskTime = null;
-
 
         ComputerInfo computerInfo = new ComputerInfo();
 
@@ -55,7 +51,6 @@ namespace TaskManager
         //High level - process start/stop events
         public event ProcessEventHandler ProcessStart = null;
         public event ProcessEventHandler ProcessStop = null;
-
         public event PreformanceEventHandler PreformanceUpdate = null;
 
         public SystemWatcher()
@@ -83,23 +78,30 @@ namespace TaskManager
         void processStartEvent_EventArrived(object sender, EventArrivedEventArgs e)
         {
             //Get processID and pass to High level subscribers
-            int processID = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
-            string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
-            ProcessStart?.Invoke(this, new ProcessEventArgs(processID, processName));
+            ProcessStart?.Invoke(this, new ProcessEventArgs
+            {
+                ProcessID = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value),
+                ProcessName = e.NewEvent.Properties["ProcessName"].Value.ToString()
+            });
         }
         void processStopEvent_EventArrived(object sender, EventArrivedEventArgs e)
         {
-            int processID = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
-            string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
-            ProcessStop?.Invoke(this, new ProcessEventArgs(processID, processName));
+            ProcessStop?.Invoke(this, new ProcessEventArgs
+            {
+                ProcessID   = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value),
+                ProcessName = e.NewEvent.Properties["ProcessName"].Value.ToString()
+            });
         }
+        //Timer event
         void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             this.PreformanceUpdate?.Invoke(this, new PreformanceEventArgs
             {
-                CPU_Usage = this.cpuTime.NextValue(),
-                DISC_Usage = this.diskTime.NextValue(),
-                RAM_Usage = ((this.computerInfo.TotalPhysicalMemory - this.computerInfo.AvailablePhysicalMemory) * 100) / this.computerInfo.TotalPhysicalMemory                
+                CPU_Usage       = this.cpuTime.NextValue(),
+                DISC_Usage      = this.diskTime.NextValue(),
+                RAM_Usage       = ((this.computerInfo.TotalPhysicalMemory - this.computerInfo.AvailablePhysicalMemory) * 100) / this.computerInfo.TotalPhysicalMemory,
+                RAM_Available   = this.computerInfo.AvailablePhysicalMemory,
+                RAM_Total       = this.computerInfo.TotalPhysicalMemory            
             });
         }
 

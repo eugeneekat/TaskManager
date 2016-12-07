@@ -25,6 +25,8 @@ namespace TaskManager
         public float DISC_Usage { get; set; }
         public ulong RAM_Available { get; set; }
         public ulong RAM_Total { get; set; }
+        public float DISC_ReadBytes { get; set; }
+        public float DISC_WriteBytes { get; set; }
     }
 
 
@@ -38,7 +40,10 @@ namespace TaskManager
         ManagementEventWatcher processStopWathcher = null;
 
         PerformanceCounter cpuTime  = null;
+
         PerformanceCounter diskTime = null;
+        PerformanceCounter diskReadBytes = null;
+        PerformanceCounter diskWriteBytes = null;
 
         ComputerInfo computerInfo = new ComputerInfo();
 
@@ -60,8 +65,10 @@ namespace TaskManager
             this.processStartWathcher.EventArrived      += new EventArrivedEventHandler(processStartEvent_EventArrived);
             this.processStopWathcher.EventArrived       += new EventArrivedEventHandler(processStopEvent_EventArrived);
             this.timer.Elapsed                          += Timer_Elapsed;
-            this.cpuTime = new PerformanceCounter   { CategoryName = "Processor", CounterName = "% Processor Time", InstanceName = "_Total" };
-            this.diskTime = new PerformanceCounter  { CategoryName = "PhysicalDisk", CounterName = "% Disk Time", InstanceName = "_Total" };        
+            this.cpuTime    = new PerformanceCounter   { CategoryName = "Processor", CounterName = "% Processor Time", InstanceName = "_Total" };
+            this.diskTime   = new PerformanceCounter  { CategoryName = "PhysicalDisk", CounterName = "% Disk Time", InstanceName = "_Total" };
+            this.diskReadBytes = new PerformanceCounter { CategoryName = "PhysicalDisk", CounterName = "Disk Read Bytes/sec", InstanceName = "_Total" };
+            this.diskWriteBytes = new PerformanceCounter { CategoryName = "PhysicalDisk", CounterName = "Disk Write Bytes/sec", InstanceName = "_Total" };
         }
 
 
@@ -97,11 +104,13 @@ namespace TaskManager
         {
             this.PreformanceUpdate?.Invoke(this, new PreformanceEventArgs
             {
-                CPU_Usage       = this.cpuTime.NextValue(),
-                DISC_Usage      = this.diskTime.NextValue(),
-                RAM_Usage       = ((this.computerInfo.TotalPhysicalMemory - this.computerInfo.AvailablePhysicalMemory) * 100) / this.computerInfo.TotalPhysicalMemory,
-                RAM_Available   = this.computerInfo.AvailablePhysicalMemory,
-                RAM_Total       = this.computerInfo.TotalPhysicalMemory            
+                CPU_Usage           = this.cpuTime.NextValue(),
+                DISC_Usage          = this.diskTime.NextValue(),
+                RAM_Usage           = ((this.computerInfo.TotalPhysicalMemory - this.computerInfo.AvailablePhysicalMemory) * 100) / this.computerInfo.TotalPhysicalMemory,
+                RAM_Available       = this.computerInfo.AvailablePhysicalMemory,
+                RAM_Total           = this.computerInfo.TotalPhysicalMemory,
+                DISC_ReadBytes      = this.diskReadBytes.NextValue(),
+                DISC_WriteBytes     = this.diskWriteBytes.NextValue(),        
             });
         }
 

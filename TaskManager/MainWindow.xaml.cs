@@ -55,6 +55,16 @@ namespace TaskManager
                 this.pbCPU.Value = (int)e.CPU_Usage;
                 this.pbRAM.Value = (int)(e.RAM_Usage);
                 this.pbDisc.Value = (int)e.DISC_Usage;
+                this.DiskInfo.Text = string.Format(
+                    "Read (mb/s): {0:F2}\n" +
+                    "Write (mb/s): {1:F2}",
+                    (e.DISC_ReadBytes / 1024f) / 1024f,
+                    (e.DISC_WriteBytes / 1024f) / 1024f);
+                this.RamInfo.Text = string.Format(
+                    "Available(GB): {0:F2}\n" +
+                    "Total(GB): {1:F2}",
+                    ((e.RAM_Available / 1024f)/1024f)/1024f,
+                    ((e.RAM_Total / 1024f)/1024f)/1024f);
             });
         }
 

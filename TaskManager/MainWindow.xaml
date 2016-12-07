@@ -6,74 +6,88 @@
         xmlns:local="clr-namespace:TaskManager"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" Closing="Window_Closing">
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20*"/>
-            <RowDefinition Height="70*"/>
+            <RowDefinition Height="25*"/>
+            <RowDefinition Height="65*"/>
             <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
 
+        <!--#region Performance info-->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" BorderThickness="2" BorderBrush="Black"/>
-            <Border Grid.Column="1" BorderThickness="2" BorderBrush="Black"/>
-            <Border Grid.Column="2" BorderThickness="2" BorderBrush="Black"/>
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40*"/>
-                    <RowDefinition Height="60*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="CPU Usage"/>
-                <Grid Grid.Row="1" Margin="2,0,2,2">
-                    <ProgressBar Name="pbCPU"/>
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbCPU, Path=Value, StringFormat={}{0}%}"/>
-                </Grid>
-            </Grid>
 
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40*"/>
-                    <RowDefinition Height="60*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="RAM Usage"/>
-                <Grid Grid.Row="1" Margin="2,0,2,2">
-                    <ProgressBar Name="pbRAM"/>
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbRAM, Path=Value, StringFormat={}{0}%}"/>
+            <!--#region CPU-->
+            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="2">
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="70*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <ProgressBar Name="pbCPU" Orientation="Vertical"/>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbCPU, Path=Value, StringFormat={}{0}%}"/>
+                    </Grid>
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="CPU Usage"/>
                 </Grid>
-            </Grid>
+            </Border>
+            <!--#endregion-->
 
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40*"/>
-                    <RowDefinition Height="60*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Disc Usage"/>
-                <Grid Grid.Row="1" Margin="2,0,2,2">
-                    <ProgressBar Name="pbDisc"/>
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbDisc, Path=Value, StringFormat={}{0}%}"/>
+            <!--#region RAM-->
+            <Border Grid.Column="1" BorderBrush="Black" BorderThickness="2">
+                <Grid Grid.Column="1" Margin="-2,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="70*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <ProgressBar Name="pbRAM" Orientation="Vertical"/>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbRAM, Path=Value, StringFormat={}{0}%}"/>
+                    </Grid>
+                    <TextBlock Name="RamInfo" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                 </Grid>
-            </Grid>
+            </Border>
+            <!--#endregion-->
+
+            <!--#region DISC-->
+            <Border Grid.Column="2" BorderBrush="Black" BorderThickness="2">
+                <Grid Grid.Column="2" Margin="-2,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="70*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <ProgressBar Name="pbDisc" Orientation="Vertical"/>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbDisc, Path=Value, StringFormat={}{0}%}"/>
+                    </Grid>
+                    <TextBlock Name="DiskInfo" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+
         </Grid>
+        <!--#endregion-->
 
+        <!--#region Process List-->
         <ListView Grid.Row="1" Name="ProcessListView" GridViewColumnHeader.Click="ProcessListView_Click">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}"/>
-                    <GridViewColumn Header="ProcessName" DisplayMemberBinding="{Binding Path=ProcessName}"/>
-                    <GridViewColumn Header="MainWindowTitle" DisplayMemberBinding="{Binding Path=MainWindowTitle}"/>
-                    <GridViewColumn Header="PriorityClass" DisplayMemberBinding="{Binding Path=PriorityClass}"/>
+                    <GridViewColumn Header = "Id"               DisplayMemberBinding = "{Binding Path=Id}"/>
+                    <GridViewColumn Header = "ProcessName"      DisplayMemberBinding = "{Binding Path=ProcessName}"/>
+                    <GridViewColumn Header = "MainWindowTitle"  DisplayMemberBinding = "{Binding Path=MainWindowTitle}"/>
+                    <GridViewColumn Header = "PriorityClass"    DisplayMemberBinding = "{Binding Path=PriorityClass}"/>
                 </GridView>
             </ListView.View>
         </ListView>
-
+        <!--#endregion-->
 
         <Button Grid.Row="2" Click="Kill_Process">KILL</Button>
-        
-    </Grid>
 
+    </Grid>
 
 </Window>

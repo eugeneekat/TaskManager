@@ -143,7 +143,7 @@
         <!--#endregion-->
         
         <Button Grid.Row="2" BorderBrush="Lime" BorderThickness="3" Background="Black" Foreground="Lime" Click="Kill_Process" 
-                MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave">KILL PROCESS</Button>
+                MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" FontSize="24">KILL PROCESS</Button>
     </Grid>
 
 </Window>

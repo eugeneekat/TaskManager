@@ -30,13 +30,12 @@ namespace TaskManager
     /// 
     public partial class MainWindow : Window
     {
-        ConcurrentDictionary<int, Process> dic = new ConcurrentDictionary<int, Process>(Process.GetProcesses().ToDictionary(x => x.Id));
+        ConcurrentDictionary<int, Process> processes = new ConcurrentDictionary<int, Process>(Process.GetProcesses().ToDictionary(x => x.Id));
 
         SystemWatcher wathcer = new SystemWatcher();
 
         GridViewColumnHeader lastHeaderClicked = null;
         ListSortDirection lastDirection = ListSortDirection.Ascending;
-
 
         public MainWindow()
         {
@@ -46,10 +45,10 @@ namespace TaskManager
             wathcer.ProcessStop += this.ProcessStop;
             wathcer.PreformanceUpdate += PreformanceUpdate;
             wathcer.Run();
-            this.ProcessListView.ItemsSource = dic.Values;
+            this.ProcessListView.ItemsSource = processes.Values;
         }
 
-        private void PreformanceUpdate(object sender, PreformanceEventArgs e)
+        private void PreformanceUpdate(object sender, PerformanceEventArgs e)
         {
             Dispatcher.Invoke(() => {
                 this.pbCPU.Value = (int)e.CPU_Usage;
@@ -65,6 +64,16 @@ namespace TaskManager
                     "Total(GB): {1:F2}",
                     ((e.RAM_Available / 1024f)/1024f)/1024f,
                     ((e.RAM_Total / 1024f)/1024f)/1024f);
+                this.CpuInfo.Text = string.Format(
+                    "Process Count: {0}\n" +
+                    "Thread Count: {1:F0}",
+                    this.processes.Count,
+                    e.CPU_ThradCount);
+                this.cpuGradient.Offset = 2.0 - (this.pbCPU.Value / 100);
+                this.ramGradient.Offset = 2.0 - (this.pbRAM.Value / 100);
+                this.diskGradient.Offset = 2.0 - (this.pbDisc.Value / 100);
+
+     
             });
         }
 
@@ -76,7 +85,7 @@ namespace TaskManager
                 Process newProcess = Process.GetProcessById(e.ProcessID);
                 bool added = false;
                 while (!added)
-                    added = this.dic.TryAdd(newProcess.Id, newProcess);
+                    added = this.processes.TryAdd(newProcess.Id, newProcess);
             }
             catch (Exception)
             {
@@ -88,11 +97,11 @@ namespace TaskManager
 
         void ProcessStop(object sender, ProcessEventArgs e)
         {
-            if (dic.ContainsKey(e.ProcessID))
+            if (processes.ContainsKey(e.ProcessID))
             {
                 Process proc = null;
                 while (proc == null)
-                    dic.TryRemove(e.ProcessID, out proc);
+                    processes.TryRemove(e.ProcessID, out proc);
             }
             if (!Dispatcher.CheckAccess())
                 Dispatcher.Invoke(this.UpdateProcessList);
@@ -100,7 +109,7 @@ namespace TaskManager
 
         void UpdateProcessList()
         {
-            this.ProcessListView.ItemsSource = dic.Values;
+            this.ProcessListView.ItemsSource = processes.Values;
             if(this.lastHeaderClicked != null)
                 this.Sort(this.lastHeaderClicked.Content.ToString(), lastDirection);
         }
@@ -121,7 +130,7 @@ namespace TaskManager
         {
             GridViewColumnHeader headerClicked = e.OriginalSource as GridViewColumnHeader;
             ListSortDirection direction;
-            if (headerClicked != null)
+            if (headerClicked != null && headerClicked.Column != null)
             {
                 if (headerClicked != this.lastHeaderClicked)
                     direction = ListSortDirection.Ascending;
@@ -144,6 +153,53 @@ namespace TaskManager
             SortDescription sd = new SortDescription(sortBy, direction);
             this.ProcessListView.Items.SortDescriptions.Add(sd);
             this.ProcessListView.Items.Refresh();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Process selectedProcess = this.ProcessListView.SelectedItem as Process;
+            
+            if (selectedProcess != null && !selectedProcess.HasExited)
+            {
+                MenuItem item = sender as MenuItem;
+                if (item != null)
+                {
+                    switch (item.Header.ToString())
+                    {
+                        case "Idle":
+                            selectedProcess.PriorityClass = ProcessPriorityClass.Idle;
+                            break;
+                        case "Normal":
+                            selectedProcess.PriorityClass = ProcessPriorityClass.Normal;
+                            break;
+                        case "High":
+                            selectedProcess.PriorityClass = ProcessPriorityClass.High;
+                            break;
+                        case "RealTime":
+                            selectedProcess.PriorityClass = ProcessPriorityClass.RealTime;
+                            break;
+                    }
+                }
+            }
+            this.UpdateProcessList();            
+        }
+
+        private void Button_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Button btn = sender as Button;
+            Brush backGround = btn.Foreground;
+            Brush foreGround = btn.Background;
+            btn.Foreground = foreGround;
+            btn.Background = backGround;         
+        }
+
+        private void Button_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Button btn = sender as Button;
+            Brush backGround = btn.Foreground;
+            Brush foreGround = btn.Background;
+            btn.Foreground = foreGround;
+            btn.Background = backGround;
         }
     }
 }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaskManager"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Closing="Window_Closing">
+        Title="MainWindow" Height="350" Width="525" Closing="Window_Closing" BorderBrush="Lime" BorderThickness="2" FontFamily="Showcard Gothic">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -13,9 +13,8 @@
             <RowDefinition Height="65*"/>
             <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
-
         <!--#region Performance info-->
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" Background="Black">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -30,10 +29,25 @@
                         <ColumnDefinition Width="70*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
-                        <ProgressBar Name="pbCPU" Orientation="Vertical"/>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbCPU, Path=Value, StringFormat={}{0}%}"/>
+                        <ProgressBar Name="pbCPU" Orientation="Vertical" Background="DarkGray">
+                            <ProgressBar.Foreground>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <RotateTransform CenterY="0" CenterX="0" Angle="270"/>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="Lime" Offset="0"/>
+                                    <GradientStop x:Name="cpuGradient" Color="Red"/>
+                                </LinearGradientBrush>
+                            </ProgressBar.Foreground>
+                        </ProgressBar>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   Text="{Binding ElementName=pbCPU, Path=Value, StringFormat={}{0}%}"/>
                     </Grid>
-                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="CPU Usage"/>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <TextBlock FontSize="24" Foreground="Lime" HorizontalAlignment="Center">CPU</TextBlock>
+                        <TextBlock Name="CpuInfo" Foreground="Lime" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    
                 </Grid>
             </Border>
             <!--#endregion-->
@@ -46,10 +60,24 @@
                         <ColumnDefinition Width="70*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
-                        <ProgressBar Name="pbRAM" Orientation="Vertical"/>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbRAM, Path=Value, StringFormat={}{0}%}"/>
+                        <ProgressBar Name="pbRAM" Orientation="Vertical" Background="DarkGray">
+                            <ProgressBar.Foreground>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <RotateTransform CenterY="0" CenterX="0" Angle="270"/>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="Lime" Offset="0"/>
+                                    <GradientStop x:Name="ramGradient" Color="Red"/>
+                                </LinearGradientBrush>
+                            </ProgressBar.Foreground>
+                        </ProgressBar>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   Text="{Binding ElementName=pbRAM, Path=Value, StringFormat={}{0}%}"/>
                     </Grid>
-                    <TextBlock Name="RamInfo" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <TextBlock FontSize="24" Foreground="Lime" HorizontalAlignment="Center">RAM</TextBlock>
+                        <TextBlock Name="RamInfo" Foreground="Lime" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
                 </Grid>
             </Border>
             <!--#endregion-->
@@ -62,10 +90,24 @@
                         <ColumnDefinition Width="70*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
-                        <ProgressBar Name="pbDisc" Orientation="Vertical"/>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=pbDisc, Path=Value, StringFormat={}{0}%}"/>
+                        <ProgressBar Name="pbDisc" Orientation="Vertical" Background="DarkGray">
+                            <ProgressBar.Foreground>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <RotateTransform CenterY="0" CenterX="0" Angle="270"/>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="Lime" Offset="0"/>
+                                    <GradientStop x:Name="diskGradient" Color="Red"/>
+                                </LinearGradientBrush>
+                            </ProgressBar.Foreground>
+                        </ProgressBar>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   Text="{Binding ElementName=pbDisc, Path=Value, StringFormat={}{0}%}"/>
                     </Grid>
-                    <TextBlock Name="DiskInfo" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <TextBlock FontSize="24" Foreground="Lime" HorizontalAlignment="Center">DISC</TextBlock>
+                        <TextBlock Name="DiskInfo" Grid.Column="1" Foreground="Lime" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
                 </Grid>
             </Border>
             <!--#endregion-->
@@ -74,20 +116,34 @@
         <!--#endregion-->
 
         <!--#region Process List-->
-        <ListView Grid.Row="1" Name="ProcessListView" GridViewColumnHeader.Click="ProcessListView_Click">
+
+        <ListView Background="Black" Foreground="Lime" Grid.Row="1" Name="ProcessListView" GridViewColumnHeader.Click="ProcessListView_Click" SelectionMode="Single">
+            <ListView.ContextMenu>
+                <ContextMenu x:Name="ItemContextMenu">
+                    <MenuItem Header="Priority">
+                        <MenuItem Header="Idle" Click="MenuItem_Click"/>
+                        <MenuItem Header="Normal" Click="MenuItem_Click"/>
+                        <MenuItem Header= "High" Click="MenuItem_Click"/>
+                        <MenuItem Header= "RealTime" Click="MenuItem_Click"/>
+                    </MenuItem>
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header = "Id"               DisplayMemberBinding = "{Binding Path=Id}"/>
-                    <GridViewColumn Header = "ProcessName"      DisplayMemberBinding = "{Binding Path=ProcessName}"/>
-                    <GridViewColumn Header = "MainWindowTitle"  DisplayMemberBinding = "{Binding Path=MainWindowTitle}"/>
-                    <GridViewColumn Header = "PriorityClass"    DisplayMemberBinding = "{Binding Path=PriorityClass}"/>
+                    <GridView.Columns>
+                        <GridViewColumn Header = "Id"               DisplayMemberBinding = "{Binding Path=Id}"/>
+                        <GridViewColumn Header = "ProcessName"      DisplayMemberBinding = "{Binding Path=ProcessName}"/>
+                        <GridViewColumn Header = "MainWindowTitle"  DisplayMemberBinding = "{Binding Path=MainWindowTitle}"/>
+                        <GridViewColumn Header = "PriorityClass"    DisplayMemberBinding = "{Binding Path=PriorityClass}"/>
+                    </GridView.Columns>
                 </GridView>
             </ListView.View>
         </ListView>
+        
         <!--#endregion-->
-
-        <Button Grid.Row="2" Click="Kill_Process">KILL</Button>
-
+        
+        <Button Grid.Row="2" BorderBrush="Lime" BorderThickness="3" Background="Black" Foreground="Lime" Click="Kill_Process" 
+                MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave">KILL PROCESS</Button>
     </Grid>
 
 </Window>

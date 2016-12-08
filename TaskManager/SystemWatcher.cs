@@ -18,7 +18,7 @@ namespace TaskManager
         public string ProcessName { get; set; }
     }
 
-    public class PreformanceEventArgs
+    public class PerformanceEventArgs
     {
         public float CPU_Usage { get; set; }
         public float RAM_Usage { get; set;}
@@ -27,6 +27,7 @@ namespace TaskManager
         public ulong RAM_Total { get; set; }
         public float DISC_ReadBytes { get; set; }
         public float DISC_WriteBytes { get; set; }
+        public float CPU_ThradCount { get; set; }
     }
 
 
@@ -44,6 +45,7 @@ namespace TaskManager
         PerformanceCounter diskTime = null;
         PerformanceCounter diskReadBytes = null;
         PerformanceCounter diskWriteBytes = null;
+        PerformanceCounter threadCount = null;
 
         ComputerInfo computerInfo = new ComputerInfo();
 
@@ -51,7 +53,7 @@ namespace TaskManager
         
         //High level - eventhandler delegate type
         public delegate void ProcessEventHandler (object sender, ProcessEventArgs e);
-        public delegate void PreformanceEventHandler(object sender, PreformanceEventArgs e);
+        public delegate void PreformanceEventHandler(object sender, PerformanceEventArgs e);
         
         //High level - process start/stop events
         public event ProcessEventHandler ProcessStart = null;
@@ -69,6 +71,7 @@ namespace TaskManager
             this.diskTime   = new PerformanceCounter  { CategoryName = "PhysicalDisk", CounterName = "% Disk Time", InstanceName = "_Total" };
             this.diskReadBytes = new PerformanceCounter { CategoryName = "PhysicalDisk", CounterName = "Disk Read Bytes/sec", InstanceName = "_Total" };
             this.diskWriteBytes = new PerformanceCounter { CategoryName = "PhysicalDisk", CounterName = "Disk Write Bytes/sec", InstanceName = "_Total" };
+            this.threadCount = new PerformanceCounter { CategoryName = "Process", CounterName = "Thread Count", InstanceName = "_Total" };
         }
 
 
@@ -102,7 +105,7 @@ namespace TaskManager
         //Timer event
         void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            this.PreformanceUpdate?.Invoke(this, new PreformanceEventArgs
+            this.PreformanceUpdate?.Invoke(this, new PerformanceEventArgs
             {
                 CPU_Usage           = this.cpuTime.NextValue(),
                 DISC_Usage          = this.diskTime.NextValue(),
@@ -110,7 +113,8 @@ namespace TaskManager
                 RAM_Available       = this.computerInfo.AvailablePhysicalMemory,
                 RAM_Total           = this.computerInfo.TotalPhysicalMemory,
                 DISC_ReadBytes      = this.diskReadBytes.NextValue(),
-                DISC_WriteBytes     = this.diskWriteBytes.NextValue(),        
+                DISC_WriteBytes     = this.diskWriteBytes.NextValue(),
+                CPU_ThradCount      = this.threadCount.NextValue()
             });
         }
 
